@@ -1,0 +1,57 @@
+on:
+  pull_request:
+    types: ['opened', 'synchronize', 'reopened']
+  push:
+    branches:
+      - master
+
+jobs:
+  update_shards:
+    name: update repodata shards
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: goanpeca/setup-miniconda@v1
+        with:
+          python-version: 3.7
+          channels: conda-forge,defaults
+          channel-priority: strict
+          show-channel-urls: true
+      - name: make repodata
+        shell: bash -l {0}
+        run: |
+          conda info
+          conda list
+          conda config --show-sources
+          conda config --show
+          conda install -y -q \
+            python-rapidjson \
+            tqdm \
+            requests \
+            git \
+            pygithub \
+            joblib \
+            bzip2
+
+          tm=$(python -c "import datetime; print(datetime.datetime.utcnow().strftime('%Y.%m.%d.%H.%M.%S'))")
+          git config --global user.email 'becker.mr@gmail.com'
+          git config --global user.name 'beckermr'
+
+          git clone --depth=1 https://github.com/regro/repodata-shards.git
+          rd_pth=`pwd`/repodata-shards
+
+          pushd ${GITHUB_WORKSPACE}
+          python scripts/make_repodata.py ${tm} ${rd_pth}
+
+          if [[ ${GITHUB_REF} == "refs/heads/master" ]]; then
+            python scripts/make_repodata_release.py ${tm}
+
+            repo_url=https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+            git remote set-url --push origin ${repo_url}
+
+            git add repodata_shards_info.json
+            git commit -m "[ci skip] made repodata ${tm}"
+            git push
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
