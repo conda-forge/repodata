@@ -43,8 +43,10 @@ jobs:
           pushd ${GITHUB_WORKSPACE}
           python scripts/make_repodata.py ${tm} ${rd_pth}
 
+          ls -lah *
+
           if [[ ${GITHUB_REF} == "refs/heads/master" ]]; then
-            python scripts/make_repodata_release.py ${tm}
+            python scripts/make_repodata_release.py ${tm} ${rd_pth}
 
             repo_url=https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
             git remote set-url --push origin ${repo_url}
