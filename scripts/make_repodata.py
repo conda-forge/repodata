@@ -115,19 +115,19 @@ if __name__ == "__main__":
             removed=r.json()["removed"],
         )
         for label in rd:
-            with open(f"repodata_{subdir}_{label}_{tm}.json", "w") as fp:
+            with open(f"repodata_{subdir}_{label}.json", "w") as fp:
                 json.dump(rd[label], fp)
             subprocess.run(
-                f"bzip2 --keep repodata_{subdir}_{label}_{tm}.json",
+                f"bzip2 --keep repodata_{subdir}_{label}.json",
                 shell=True,
             )
         for label in _links:
             if label not in links:
                 links[label] = {}
             links[label].update(_links[label])
-    with open(f"links_{tm}.json", "w") as fp:
+    with open(f"links.json", "w") as fp:
         json.dump(links, fp)
     subprocess.run(
-        f"bzip2 links_{tm}.json",
+        f"bzip2 links.json",
         shell=True,
     )
