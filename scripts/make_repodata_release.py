@@ -17,7 +17,7 @@ sha = subprocess.run(
 ).stdout.decode("utf-8").strip()
 
 rd_sha = subprocess.run(
-    "pushd %s && git rev-parse --verify HEAD && popd" % sys.argv[2],
+    "cd %s && git rev-parse --verify HEAD" % sys.argv[2],
     shell=True,
     capture_output=True,
 ).stdout.decode("utf-8").strip()
