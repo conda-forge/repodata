@@ -94,8 +94,8 @@ def build_links_and_repodata_from_packages(
                 repodata[label]["packages"][shard["package"]] = shard["repodata"]
                 links[label][subdir_pkg] = shard["url"]
 
-    if "main" in rd:
-        rd["main"]["removed"] = removed
+    if "main" in repodata:
+        repodata["main"]["removed"] = removed
 
     return repodata, links
 
@@ -103,22 +103,31 @@ def build_links_and_repodata_from_packages(
 if __name__ == "__main__":
     tm = sys.argv[1]
     shards_path = sys.argv[2]
+    links = {}
     subdirs = ["linux-64", "osx-64", "win-64", "linux-aarch64", "linux-ppc64le"]
     for subdir in subdirs:
         r = requests.get(
             f"https://conda.anaconda.org/conda-forge/{subdir}/repodata.json"
         )
-        rd, links = build_links_and_repodata_from_packages(
+        rd, _links = build_links_and_repodata_from_packages(
             shards_path,
             subdir,
             removed=r.json()["removed"],
         )
         for label in rd:
-            with open(f"repodata_{label}_{tm}.json", "w") as fp:
+            with open(f"repodata_{subdir}_{label}_{tm}.json", "w") as fp:
                 json.dump(rd[label], fp)
             subprocess.run(
-                f"bzip2 repodata_{label}_{tm}.json",
+                f"bzip2 --keep repodata_{subdir}_{label}_{tm}.json",
                 shell=True,
             )
-        with open(f"links_{tm}.json", "w") as fp:
-            json.dump(links, fp)
+        for label in _links:
+            if label not in links:
+                links[label] = {}
+            links[label].update(_links[label])
+    with open(f"links_{tm}.json", "w") as fp:
+        json.dump(links, fp)
+    subprocess.run(
+        f"bzip2 links_{tm}.json",
+        shell=True,
+    )
