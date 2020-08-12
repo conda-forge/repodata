@@ -94,8 +94,8 @@ def build_links_and_repodata_from_packages(
                 repodata[label]["packages"][shard["package"]] = shard["repodata"]
                 links[label][subdir_pkg] = shard["url"]
 
-    if "main" in rd:
-        rd["main"]["removed"] = removed
+    if "main" in repodata:
+        repodata["main"]["removed"] = removed
 
     return repodata, links
 
