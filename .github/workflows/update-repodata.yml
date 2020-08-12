@@ -37,8 +37,10 @@ jobs:
           git config --global user.email 'becker.mr@gmail.com'
           git config --global user.name 'beckermr'
 
+          pushd ..
           git clone --depth=1 https://github.com/regro/repodata-shards.git
           rd_pth=`pwd`/repodata-shards
+          popd
 
           pushd ${GITHUB_WORKSPACE}
           python scripts/make_repodata.py ${tm} ${rd_pth}
