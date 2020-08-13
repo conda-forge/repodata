@@ -23,14 +23,14 @@ jobs:
           conda list
           conda config --show-sources
           conda config --show
-          conda install -y -q \
-            python-rapidjson \
-            tqdm \
-            requests \
-            git \
-            pygithub \
-            joblib \
-            bzip2
+          conda install -y -q git
+
+          pushd ..
+          git clone --depth=1 https://github.com/regro/repodata-tools.git
+          rt_pth=`pwd`/repodata-tools
+          popd
+
+          conda install -y -q --file ${rt_pth}/requirements.txt
 
           tm=$(python -c "import datetime; print(datetime.datetime.utcnow().strftime('%Y.%m.%d.%H.%M.%S'))")
           git config --global user.email 'becker.mr@gmail.com'
@@ -42,19 +42,14 @@ jobs:
           popd
 
           pushd ${GITHUB_WORKSPACE}
-          python scripts/make_repodata.py ${tm} ${rd_pth}
+          python ${rt_pth}/scripts/make_repodata.py ${tm} ${rd_pth}
+          python ${rt_pth}/scripts/make_channeldata.py ${tm} ${rd_pth}
 
           ls -lah *
 
           if [[ ${GITHUB_REF} == "refs/heads/master" ]]; then
-            python scripts/make_repodata_release.py ${tm} ${rd_pth}
-
-            repo_url=https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
-            git remote set-url --push origin ${repo_url}
-
-            git add repodata_shards_info.json
-            git commit -m "[ci skip] made repodata ${tm}"
-            git push
+            python ${rt_pth}/scripts/make_repodata_release.py ${tm} ${rd_pth}
           fi
+          popd
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
