@@ -1,6 +1,9 @@
 on:
   pull_request:
     types: ['opened', 'synchronize', 'reopened']
+  push:
+    branches: 
+      - master
   schedule:
     - cron:  '0,20,40 * * * *'
 
@@ -70,7 +73,7 @@ jobs:
             git fetch --all 2> /dev/null
             git branch -u pushable/gh-pages
             git status
-            git push pushable gh-pages:gh-pages 2> /dev/null
+            git push pushable gh-pages:gh-pages
             popd
 
           fi
