@@ -60,11 +60,17 @@ jobs:
 
             python ${rt_pth}/scripts/make_index_pages.py ${gh_pages_pth}
             pushd ${gh_pages_pth}
-            repo_url=https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
-            git remote set-url --push origin ${repo_url}
             git add *
             git commit --allow-empty -am "[ci skip] repodata pages update"
-            git push
+            git remote add pushable https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git/ > /dev/null
+
+            # Update the remotes before pushing and check the status.
+            # This should give us more info if the push will not be
+            # a simple fast-forward push.
+            git fetch --all 2> /dev/null
+            git branch -u pushable/gh-pages
+            git status
+            git push pushable gh-pages:gh-pages 2> /dev/null
             popd
 
           fi
