@@ -63,7 +63,7 @@ jobs:
             repo_url=https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
             git remote set-url --push origin ${repo_url}
             git add *
-            git ci --allow-empty -am "[ci skip] repodata pages update"
+            git commit --allow-empty -am "[ci skip] repodata pages update"
             git push
             popd
 
