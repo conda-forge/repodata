@@ -44,6 +44,9 @@ jobs:
           pushd ..
           git clone https://github.com/regro/repodata.git gh_pages
           gh_pages_pth=`pwd`/gh_pages
+          pushd ${gh_pages_pth}
+          git checkout gh-pages
+          popd
           popd
 
           pushd ${GITHUB_WORKSPACE}
