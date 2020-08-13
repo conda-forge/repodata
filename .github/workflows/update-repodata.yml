@@ -61,7 +61,7 @@ jobs:
             python ${rt_pth}/scripts/make_repodata_release.py ${tm} ${rd_pth}
 
             python ${rt_pth}/scripts/make_index_pages.py ${gh_pages_pth}
-            git stash *
+            git stash
             git checkout gh-pages
             repo_url=https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
             git remote set-url --push origin ${repo_url}
