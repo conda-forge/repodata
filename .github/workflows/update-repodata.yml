@@ -41,6 +41,11 @@ jobs:
           rd_pth=`pwd`/repodata-shards
           popd
 
+          pushd ..
+          git clone https://github.com/regro/repodata.git gh_pages
+          gh_pages_pth=`pwd`/gh_pages
+          popd
+
           pushd ${GITHUB_WORKSPACE}
           python ${rt_pth}/scripts/make_repodata.py ${tm} ${rd_pth}
           python ${rt_pth}/scripts/make_channeldata.py ${tm} ${rd_pth}
@@ -49,6 +54,16 @@ jobs:
 
           if [[ ${GITHUB_REF} == "refs/heads/master" ]]; then
             python ${rt_pth}/scripts/make_repodata_release.py ${tm} ${rd_pth}
+
+            python ${rt_pth}/scripts/make_index_pages.py ${gh_pages_pth}
+            pushd ${gh_pages_pth}
+            repo_url=https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+            git remote set-url --push origin ${repo_url}
+            git add *
+            git ci --allow-empty -am "[ci skip] repodata pages update"
+            git push
+            popd
+
           fi
           popd
         env:
