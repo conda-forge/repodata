@@ -10,9 +10,6 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v2
-        with:
-          depth: 0
-          fetch-depth: 0
       - uses: goanpeca/setup-miniconda@v1
         with:
           python-version: 3.7
@@ -44,11 +41,6 @@ jobs:
           rd_pth=`pwd`/repodata-shards
           popd
 
-          pushd ..
-          mkdir -p index_pages
-          gh_pages_pth=`pwd`/index_pages
-          popd
-
           pushd ${GITHUB_WORKSPACE}
           python ${rt_pth}/scripts/make_repodata.py ${tm} ${rd_pth}
           python ${rt_pth}/scripts/make_channeldata.py ${tm} ${rd_pth}
@@ -57,17 +49,6 @@ jobs:
 
           if [[ ${GITHUB_REF} == "refs/heads/master" ]]; then
             python ${rt_pth}/scripts/make_repodata_release.py ${tm} ${rd_pth}
-
-            python ${rt_pth}/scripts/make_index_pages.py ${gh_pages_pth}
-            rm -f *.json
-            rm -f *.json.bz2
-            git checkout gh-pages
-            repo_url=https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
-            git remote set-url --push origin ${repo_url}
-            cp -r ${gh_pages_pth}/* .
-            git add *
-            git commit --allow-empty -am "[ci skip] repodata pages update"
-            git push
           fi
           popd
         env:
