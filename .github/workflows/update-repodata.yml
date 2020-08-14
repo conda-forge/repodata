@@ -50,6 +50,5 @@ jobs:
           if [[ ${GITHUB_REF} == "refs/heads/master" ]]; then
             python ${rt_pth}/scripts/make_repodata_release.py ${tm} ${rd_pth}
           fi
-          popd
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
