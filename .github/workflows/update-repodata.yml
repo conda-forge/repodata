@@ -2,7 +2,7 @@ on:
   pull_request:
     types: ['opened', 'synchronize', 'reopened']
   schedule:
-    - cron:  '0,20,40 * * * *'
+    - cron:  '15,35,55 * * * *'
 
 jobs:
   update_shards:
