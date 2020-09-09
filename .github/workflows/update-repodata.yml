@@ -1,60 +1,55 @@
+name: repoworker
+
 on:
   pull_request:
     types: ['opened', 'synchronize', 'reopened']
   push:
-    branches: 
+    branches:
       - master
-#   schedule:
-#     - cron:  '15,35,55 * * * *'
 
 jobs:
   update_shards:
     name: update repodata shards
     runs-on: "ubuntu-latest"
     steps:
+      - name: cancel previous runs
+        uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          access_token: ${{ secrets.MY_PAT }}
+
       - uses: actions/checkout@v2
+
       - uses: goanpeca/setup-miniconda@v1
         with:
           python-version: 3.7
           channels: conda-forge,defaults
           channel-priority: strict
           show-channel-urls: true
+
       - name: make repodata
         shell: bash -l {0}
         run: |
-          conda info
-          conda list
-          conda config --show-sources
-          conda config --show
           conda install -y -q git
 
           pushd ..
           git clone --depth=1 https://github.com/regro/repodata-tools.git
-          rt_pth=`pwd`/repodata-tools
+          pushd repodata-tools
+          conda install -y -q --file requirements.txt
+          pip install -e .
+          popd
           popd
 
-          conda install -y -q --file ${rt_pth}/requirements.txt
-
-          tm=$(python -c "import datetime; print(datetime.datetime.utcnow().strftime('%Y.%m.%d.%H.%M.%S'))")
-          git config --global user.email 'becker.mr@gmail.com'
-          git config --global user.name 'beckermr'
-
-          curl -L https://api.github.com/repos/regro/repodata-shards/tarball > repodata-shards.tar.gz
-          tar xf repodata-shards.tar.gz
-          rd_pth=$(compgen -G "regro-repodata-shards-*")
-          # pushd ..
-          # git clone --depth=1 https://github.com/regro/repodata-shards.git
-          # rd_pth=`pwd`/repodata-shards
-          # popd
-
-          pushd ${GITHUB_WORKSPACE}
-          python ${rt_pth}/scripts/make_repodata.py ${tm} ${rd_pth}
-          python ${rt_pth}/scripts/make_channeldata.py ${tm} ${rd_pth}
-
-          ls -lah *
-
           if [[ ${GITHUB_REF} == "refs/heads/master" ]]; then
-            python ${rt_pth}/scripts/make_repodata_release.py ${tm} ${rd_pth}
+            run-repodata-worker --make-releases 1800
+          else
+            run-repodata-worker 300
           fi
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MY_PAT }}
+
+      - name: trigger next job
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: repoworker
+          token: ${{ secrets.MY_PAT }}
+        if: github.ref == "refs/heads/master"
