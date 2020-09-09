@@ -52,4 +52,4 @@ jobs:
         with:
           workflow: repoworker
           token: ${{ secrets.MY_PAT }}
-        if: github.ref == "refs/heads/master"
+        if: github.ref == 'refs/heads/master'
