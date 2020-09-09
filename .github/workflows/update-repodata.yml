@@ -32,8 +32,9 @@ jobs:
           conda install -y -q git
 
           pushd ..
-          git clone --depth=1 https://github.com/regro/repodata-tools.git
+          git clone https://github.com/regro/repodata-tools.git
           pushd repodata-tools
+          git co repoworker
           conda install -y -q --file requirements.txt
           pip install -e .
           popd
