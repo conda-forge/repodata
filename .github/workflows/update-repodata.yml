@@ -42,7 +42,7 @@ jobs:
           popd
 
           if [[ ${GITHUB_REF} == "refs/heads/master" ]]; then
-            run-repodata-worker --make-releases --main-only 18000 --allow-unsafe
+            run-repodata-worker --make-releases --main-only 18000
           else
             run-repodata-worker 300
           fi
