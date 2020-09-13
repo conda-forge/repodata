@@ -38,7 +38,6 @@ jobs:
           pushd ..
           git clone https://github.com/regro/repodata-tools.git
           pushd repodata-tools
-          git checkout repoworker
           conda install -y -q --file requirements.txt
           pip install -e .
           popd
