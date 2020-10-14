@@ -41,5 +41,5 @@ jobs:
         uses: benc-uk/workflow-dispatch@v1
         if: github.ref == 'refs/heads/master' && ! cancelled() && ! failure() && ! env.CI_SKIP
         with:
-          workflow:
-          token: ${{ secrets.AUTOTICK_BOT_TOKEN }}
+          workflow: repoworker
+          token: ${{ secrets.MY_PAT }}
