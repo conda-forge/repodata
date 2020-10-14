@@ -80,4 +80,4 @@ jobs:
         with:
           workflow: repoworker
           token: ${{ secrets.MY_PAT }}
-        if: github.ref == 'refs/heads/master' && ! env.CI_SKIP
+        if: github.ref == 'refs/heads/master' && ! env.CI_SKIP && always()
