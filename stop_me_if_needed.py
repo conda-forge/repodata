@@ -21,7 +21,7 @@ with tempfile.TemporaryDirectory() as tmpdir, pushd(tmpdir):
         check=True
     )
 
-    if os.path.exists(os.path.join("autotick-bot", "please.go")):
+    if os.path.exists(os.path.join("repodata", "please.go")):
         go = True
     else:
         go = False
