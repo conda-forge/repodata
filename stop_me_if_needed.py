@@ -17,7 +17,7 @@ def pushd(new_dir):
 
 with tempfile.TemporaryDirectory() as tmpdir, pushd(tmpdir):
     subprocess.run(
-        ["git", "clone", "--depth=1", "https://github.com/regro/repodata.git"],
+        ["git", "clone", "--depth=1", "https://github.com/conda-forge/repodata.git"],
         check=True
     )
 
@@ -28,4 +28,4 @@ with tempfile.TemporaryDirectory() as tmpdir, pushd(tmpdir):
 
 if not go:
     print("I could not find the file 'please.go' on master! Stopping!")
-    print("::set-env name=CI_SKIP::true", flush=True)
+    subprocess.run("echo \"CI_SKIP=true\" >> $GITHUB_ENV", shell=True)
